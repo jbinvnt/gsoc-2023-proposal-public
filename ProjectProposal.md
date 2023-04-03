@@ -51,6 +51,10 @@ An additional component of modernization plans is preparing to target other plat
 
 These changes should all be planned in the context of other ongoing OpenGL improvements. Many of them, such as [new error macros](https://github.com/openscad/openscad/pull/4570) and [other OpenGL refactoring](https://github.com/openscad/openscad/pull/4576) occur elsewhere in the codebase. But coordination may still be required in the event that dependent code is changed during development.
 
+### Examination of Current Rendering
+
+One particularly illustrative place where rendering currently relies on a tightly coupled process is the [`OpenCSGRenderer::createCSGProducts`](https://github.com/openscad/openscad/blob/8a07b27b7fa72f0318f02875c4e05720e0db6a47/src/glview/preview/OpenCSGRenderer.cc#L149) method. Several VBO setup operations are interlaced with iteration through the output of OpenCSG. This approach has its benefits, namely allowing the render calls to access key properties of the geometry without the need for an intermediate data structure and the associated glue code. However, to support future changes to these steps, it will be beneficial to separate them into discrete units. Moreover, doing so will make code sharing easier between the different viewport modes.
+
 ## Planned Resources
 
 The relevant libraries and frameworks for this project are already dependencies for other parts of the OpenSCAD codebase. Here are the main tools:
@@ -68,10 +72,10 @@ Specifically, as outlined in the project description, my contributions would inc
 
 ## Development Schedule
 
-| Date | Event |
-| --- | --- |
-| May 29 | Coding Begins |
-| June 23 | Milestone 1: Refactoring for stage separation in rendering |
-| July 14 | Milestone 2: Official Midterm Evaluation deadline; "Is it on track towards modern OpenGL support across viewport modes?" |
-| August 8 | Milestone 3: Developer controls for library and API use |
-| September 5 | Final Week: Code, documentation, and tests completed |
+| Date | Event | Details |
+| --- | --- | --- |
+| May 29 | Coding Begins | |
+| June 23 | Milestone 1: Refactoring for stage separation in rendering | The respective processes of shader preparation/loading, conversion/traversal of geometry, and OpenGL rendering calls should be separated into modifiable units. |
+| July 14 | Milestone 2: Official Midterm Evaluation deadline; "Is it on track towards modern OpenGL support across viewport modes?" | The restructuring from Milestone 1 should have been leveraged to enable the different viewport modes to replicate their existing rendering requirements with succinct access to the refactored internal OpenSCAD classes. |
+| August 8 | Milestone 3: Developer controls for library and API use | Through options such as macros and/or runtime `Feature::` controls, the type of geometry and OpenGL method used for rendering should be configurable. |
+| September 5 | Final Week: Code, documentation, and tests completed | A final report in the form of a pull request should be published. |
